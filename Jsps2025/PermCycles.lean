@@ -15,7 +15,7 @@ open Equiv
 abbrev S (n : Nat) := Perm (Fin n)
 
 /-!
-## Concrete examples
+## Basic calculations and examples
 
 Below, we work with examples in `S₅`:
 
@@ -40,7 +40,12 @@ def c1 : S 5 := c[0, 1, 3]
 /-- `c2 = (2 4)`-/
 def c2 : S 5 := c[2, 4]
 
-/-- `c3 = c1 c2` -/
+#eval (c[0, 1, 2] : S 3) * (c[0, 1])
+
+
+#eval (c[0, 1] : S 3) * (c[0, 1, 2])
+
+/-- `c3 = c1 c2`. Use `*` for multipication in Lean. -/
 def s : S 5   := c1 * c2
 
 /-- `t = (0 1 2 3 4)` -/
@@ -48,7 +53,7 @@ def t : S 5 := c[0, 1, 2, 3, 4]
 
 #eval s
 
-#eval s^3
+#eval s ^ 3
 
 #eval t
 
@@ -57,7 +62,7 @@ def t : S 5 := c[0, 1, 2, 3, 4]
 #eval t * s
 
 /-!
-Type `\-1` to enter `⁻¹`.
+Type `\-1` to enter `⁻¹`. So `t⁻¹` is the inverse of `t`.
 -/
 
 #eval t⁻¹
@@ -67,22 +72,16 @@ Type `\-1` to enter `⁻¹`.
 
 ### Exercise 1
 
-1. Let `u = (0 1)(3 1), v = (2 4 1)(3 2)`. By hand, express each of `u`, `v`, `u * v`, `v * u`,
-   `u ^ 3`
+1. Let `u = (0 1)(3 1), v = (2 4 1)(3 2)`. By hand, express each of `u`, `v`, `u v`, `v u`,
+  `v³`, and `u⁻¹` as products of disjoint cycles.
 
-Below, replace `sorry` in each line with appropriate products of cycles, using Lean notation,
-  so that
+2. Below, replace `sorry` in each line with appropriate products of cycles to give Lean definitions
+  of `u` and `v` from the question above.
 
-
-
-  Then use `#eval` to express each of  as products of disjoint
-  cycles.
-
-2. DO CALCULATIONS BY HAND AND CHECK WITH LEAN.
+3. Then use `#eval` to compute each of of the quantities from Question 1 of this exercise. Remember
+  to write `v³` as `v ^ 3`.
 
 3. Evaluate `u ^ m` for different values of the natural number `m`. What do you observe?
-
-
 -/
 
 /-- `u = (0 1)(3 1)` -/
@@ -185,8 +184,36 @@ def expected : Finset (Perm (Fin 5)) :=
 ### Exercise
 
 Prove that `S n` is not abelian, for `n ≥ 3`.
-
-
 -/
+
+/-- The predicate for a group to be abelian. -/
+def is_abelian (G) [Group G] := ∀ (x : G), ∀ (y : G), x * y = y * x
+
+example (n : Nat) : ¬ is_abelian (S (n+3)) := by
+  dsimp [is_abelian]
+  push_neg
+  let σ : S (n+3) := swap (0 : Fin (n+3)) 1 * swap (1 : Fin (n+3)) 2
+  let τ : S (n+3) := swap (0 : Fin (n+3)) 1
+  use σ, τ
+  -- Show (σ * τ) 0 ≠ (τ * σ) 0 by symbolic computation.
+  have hL : (σ * τ) (0 : Fin (n+3)) = 2 := by
+    simp [σ, τ]
+    apply swap_apply_of_ne_of_ne
+    · exact two_ne_zero
+    · intro two_eq_one
+      apply (one_ne_zero : (1 : Fin (n + 3)) ≠ 0)
+      change (1 : Fin (n +3)) + 1 = 0 + 1 at two_eq_one
+      apply add_right_cancel two_eq_one
+  have hR : (τ * σ) (0 : Fin (n+3)) = 0 := by
+    simp [σ, τ]
+    apply swap_apply_of_ne_of_ne
+    · exact zero_ne_one
+    · exact Ne.symm two_ne_zero
+  intro hEq
+  -- Apply both sides to 0 and use hL ≠ hR
+  rw [hEq, hR] at hL
+  have : (0 : Fin (n + 3)) ≠ 2 := Ne.symm two_ne_zero
+  contradiction
+
 
 #lint
