@@ -85,10 +85,10 @@ Type `\-1` to enter `⁻¹`. So `t⁻¹` is the inverse of `t`.
 -/
 
 /-- `u = (0 1)(3 1)` -/
-def u : S 5 := c[0, 1] * c[3, 1]
+def u : S 5 := sorry
 
 /-- `v = (2 4 1)(3 2)` -/
-def v : S 5 := c[2, 4, 1] * c[3, 2]
+def v : S 5 := sorry
 
 /-!
 
@@ -110,6 +110,47 @@ example : s * t = c[1, 4] * c[3, 2, 0] := by decide
 
 example : s⁻¹⁻¹ = s := by decide
 
+
+
+/-!
+
+## Group actions
+
+Let `G` be a group and let `M` be a set. A group action is a function
+`G × M → M`. Given `g ∈ G` and `m ∈ M`, we write `g • m` for the value of this
+function on the tuple `(g, m)`. To be a group action, the function must satisfy
+
+1. `1 • b = b` for all `b ∈ M.
+2.  `(x * y) • b = x • y • b`, for all `x, y ∈ G`, for all `b ∈ M`.
+
+
+### The conjugacy action
+
+A group `G` acts on itself by the conjugacy action
+
+`g • h := g * h * g⁻¹`
+
+### Exercise 3
+
+1. Show, by hand, that the conjugacy action is a group action.
+2. Complete the Lean proof below that the conjugacy action is a group action.
+
+-/
+
+
+variable {G : Type*} [Group G] {M : Type*}  [MulAction G M]
+
+def conjMulAction : MulAction G G where
+  smul := fun g h => g * h * g⁻¹
+  one_smul := by
+    intro h
+    change 1 * h * 1⁻¹ = h
+    group
+  mul_smul := by
+    intro x y b
+    sorry
+
+
 /-!
 
 ## Commutators
@@ -123,12 +164,7 @@ Type `\[--` to produce the commutator brackets.
 
 #eval ⁅s, s⁆
 
-#eval ⁅s, u⁆
-
 #eval s
-
-#eval u
-
 
 /-!
 
@@ -143,11 +179,6 @@ Type `\[--` to produce the commutator brackets.
 
 4. Now skip past the following blank lines and complete the Lean proof.
 -/
-
-
-
-
-
 
 
 
@@ -186,10 +217,10 @@ example {n : Nat} (a b : S n) : a * b = b * a ↔ ⁅a, b⁆ = 1 := by
 
 
 /-- The centralizer of `s` as a finset. -/
-def centralizer {n : Nat} (s : Perm (Fin n)) : Finset (Perm (Fin n)) :=
+def centralizerSet {n : Nat} (s : Perm (Fin n)) : Finset (Perm (Fin n)) :=
   (Finset.univ : Finset (Perm (Fin n))).filter (fun t => s * t = t * s)
 
-#eval centralizer s
+#eval centralizerSet s
 
 
 /-!
@@ -212,9 +243,9 @@ def expected : Finset (Perm (Fin 5)) :=
   lst.toFinset
 
 #eval s                        -- prints: c[0, 1, 3] * c[2, 4]
-#eval (centralizer s).card         -- expect 6
+#eval (centralizerSet s).card         -- expect 6
 #eval expected.card            -- = 6
-#eval decide (expected = centralizer s)  -- expect `true`
+#eval decide (expected = centralizerSet s)  -- expect `true`
 
 
 /-
@@ -251,6 +282,3 @@ example (n : Nat) : ¬ is_abelian (S (n+3)) := by
   rw [hEq, hR] at hL
   have : (0 : Fin (n + 3)) ≠ 2 := Ne.symm two_ne_zero
   contradiction
-
-
-#lint
