@@ -111,13 +111,6 @@ example : s * t = c[1, 4] * c[3, 2, 0] := by decide
 example : s⁻¹⁻¹ = s := by decide
 
 /-!
-## Conjugation
-
-
-
--/
-
-/-!
 
 ## Commutators
 
@@ -136,18 +129,60 @@ Type `\[--` to produce the commutator brackets.
 
 #eval u
 
+
 /-!
 
 ### Exercise 2
 
-1. Experiment, by varying `x`, to determine when `⁅s, x⁆` is `1`.
+1. Experiment, by varying `x`, to determine when `⁅s, x⁆` is `1` (Don't skip
+  past the following blank lines that contain the answer)!
 
 2. Can you generalise your observation?
 
-3. Prove your result
+3. Prove your result by hand.
 
-4. Prove (scaffolded) result in Lean (separate file).
+4. Now skip past the following blank lines and complete the Lean proof.
 -/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+example {n : Nat} (a b : S n) : a * b = b * a ↔ ⁅a, b⁆ = 1 := by
+  constructor -- This creates two goals: one for each direction of ↔
+  · -- This goal is to prove `a * b = b * a → ⁅a, b⁆ = 1`
+    intro (h : a * b = b * a)
+    show a * b * a⁻¹ * b⁻¹ = 1
+    rw [h]
+    show b * a * a⁻¹ * b⁻¹ = 1
+    group
+  · -- This goal is to prove `⁅a, b⁆ = 1 → a * b = b * a`
+    intro (h : ⁅a, b⁆ = 1)
+    change a * b * a⁻¹ * b⁻¹ = 1 at h
+    show a * b = b * a
+    calc a * b = a * b * a⁻¹ * b⁻¹ * b * a  := by sorry
+    _ = 1 * b * a                           := by sorry
+    _ = b * a                               := by sorry
 
 
 /-- The centralizer of `s` as a finset. -/
@@ -156,12 +191,14 @@ def centralizer {n : Nat} (s : Perm (Fin n)) : Finset (Perm (Fin n)) :=
 
 #eval centralizer s
 
-/-!
-### Exercise
 
-What do you notice about the elements of `centralizer s`?
-Generalise.
-Prove your conjecture, by hand.
+/-!
+### Exercise 3
+
+1. What do you notice about the elements of `centralizer s`?
+2. Make a conjecture regarding what `centralizer x` looks like. Try different
+  values of `x` to test your conjecture.
+3. Prove your conjecture, by hand.
 
 
 -/
@@ -181,7 +218,7 @@ def expected : Finset (Perm (Fin 5)) :=
 
 
 /-
-### Exercise
+### Exercise 4
 
 Prove that `S n` is not abelian, for `n ≥ 3`.
 -/
